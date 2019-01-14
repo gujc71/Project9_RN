@@ -1,10 +1,9 @@
-# React-Native Design Template #
+# React-Native App Template #
 
-This is a Design Template App for React-Native.
+This is a Template App for React-Native with Firebase.
 
 This app has been tested only on Android.
 
-![Screenshot](./screenshot.png)
 
 ### Library ###
 - react-native-elements
