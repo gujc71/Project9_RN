@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "android": "react-native run-android",
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest"
   },
@@ -11,9 +12,10 @@
     "react": "16.6.3",
     "react-native": "0.57.8",
     "react-native-elements": "^1.0.0-beta7",
+    "react-native-firebase": "^5.2.0",
     "react-native-gesture-handler": "^1.0.12",
     "react-native-vector-icons": "^6.1.0",
-    "react-navigation": "^3.0.8"    
+    "react-navigation": "^3.0.8"
   },
   "devDependencies": {
     "babel-jest": "23.6.0",

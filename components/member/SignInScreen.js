@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import {StyleSheet, Text, View, AsyncStorage, Dimensions,} from 'react-native';
+import {StyleSheet, Text, View, AsyncStorage, Dimensions, ToastAndroid} from 'react-native';
 import { Input, Button } from 'react-native-elements';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
+
+import firebase from 'react-native-firebase';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -28,10 +30,10 @@ export default class LoginScreen extends Component {
   }
 
   validatePassword(password) {
-    return password.length > 7;
+    return password.length > 5;
   }
 
-  submitLoginCredentials = async () => {
+  submitLoginCredentials = () => {
     const { email, password } = this.state;
     const email_valid = this.validateEmail(email);
     const password_valid = this.validatePassword(password);
@@ -43,10 +45,15 @@ export default class LoginScreen extends Component {
 
     if (!email_valid || !password_valid) return;
 
-    await AsyncStorage.setItem('userToken', email);
-
-    this.setState({showLoading: true});
-    this.props.navigation.navigate('Home');
+    const _this = this;
+    firebase.auth().signInWithEmailAndPassword(email, password).then(function() {
+      AsyncStorage.setItem('userToken', email, () => {
+        _this.setState({showLoading: true});
+        _this.props.navigation.navigate('Home');
+      });
+    }).catch(function(error) {
+      ToastAndroid.show(error.message, ToastAndroid.SHORT);
+    });
   }
 
   render() {
