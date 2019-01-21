@@ -9,15 +9,16 @@ This app has been tested only on Android.
 - react-native-elements
 - react-native-vector-icons
 - react-navigation
+- react-native-firebase
 
 ### Screen ###
-- Login 
+- Login with Firebase Authentication
 - Tab (Bottom)
 - List (FlatList with fake data)
 
 ### Install & Run ###
 
-- git clone https://github.com/gujc71/rn_design.git
+- git clone https://github.com/gujc71/Project9_RN.git
 - yarn (npm i)
 - react-native run-android (or react-native run-ios)
 
