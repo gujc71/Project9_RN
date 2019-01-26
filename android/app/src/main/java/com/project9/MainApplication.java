@@ -1,5 +1,6 @@
 package com.project9;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
@@ -26,6 +27,7 @@ public class MainApplication extends Application implements ReactApplication {
       return BuildConfig.DEBUG;
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
@@ -33,6 +35,7 @@ public class MainApplication extends Application implements ReactApplication {
             new RNFirebasePackage(),
             new RNFirebaseAuthPackage(),
             new RNFirebaseFirestorePackage(),
+            new RNFirebaseStoragePackage(),
             new VectorIconsPackage(),
             new RNGestureHandlerPackage()
       );

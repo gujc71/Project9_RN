@@ -13,7 +13,7 @@ import DetailsScreen from './components/DetailsScreen';
 
 const defaultNavigationOptions = {
   defaultNavigationOptions: {
-    title: 'Design9',
+    title: 'Project9',
     headerStyle: {
       backgroundColor: '#3F51B5',
     },

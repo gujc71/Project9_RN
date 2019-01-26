@@ -20,6 +20,7 @@ This app has been tested only on Android.
 
 - git clone https://github.com/gujc71/Project9_RN.git
 - yarn (npm i)
+- download google-services.json from firebase console and put it in /android/app
 - react-native run-android (or react-native run-ios)
 
 

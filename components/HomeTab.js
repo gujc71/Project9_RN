@@ -1,97 +1,67 @@
 import React, { Component } from 'react';
-import faker from 'faker';
-import {FlatList, View, TouchableOpacity, StyleSheet, Modal, Text} from 'react-native';
+import {FlatList, View, TouchableOpacity, StyleSheet} from 'react-native';
 import { ListItem, Icon } from 'react-native-elements'
 
-const randomUsers = (count = 10) => {
-  const arr = [];
-  for (let i = 0; i < count; i ++) {
-    arr.push({
-      key: faker.random.uuid(),
-      name: faker.name.firstName(),
-      avatar: faker.image.avatar(),
-    });
-  }
-
-  return arr;
-};
+import dateFormat from 'dateformat';
+import firebase from 'react-native-firebase';
 
 export default class HomeTab extends Component {
-  static navigationOptions = {
-    title: 'Project9',
-  };
 
   state = {
     refreshing: false,
-    data: randomUsers(20),
-    modalVisible: false,
-    selectedItem: {},
+    boards: []
   };
 
-  onEndReached = () => {
-    this.setState(state => ({
-      data: [
-        ...state.data,
-        ...randomUsers(),
-      ]
-    }));
-  };
-
-  onRefresh = () => {
-    this.setState({
-      data: randomUsers(20),
+  componentWillMount () {
+    const _this = this;
+    firebase.firestore().collection("boards").orderBy("brddate", "desc")
+        .onSnapshot(function(snapshot) {
+            var newlist = [];
+            let boards = _this.state.boards;
+            snapshot.docChanges.forEach(function(change) {
+                var row = change.doc.data();
+                if (change.type === "added") {
+                  if (newlist) newlist.push(row);
+                  else _this.setState( {..._this.state, boards: [row].concat(_this.state.boards) });
+                } else
+                if (change.type === "modified") {
+                    let inx = boards.findIndex(board => row.brdno === board.brdno);
+                    if (inx===-1) {                          // new : Insert
+                      _this.setState( {..._this.state, boards: [row].concat(_this.state.boards) });
+                    } else {                               // Update
+                      boards[inx]=row;
+                      _this.setState({..._this.state, boards: boards, refreshing: !_this.state.refreshing});
+                    }                     
+                } else
+                if (change.type === "removed") {
+                  _this.setState({..._this.state, boards: boards.filter(board => row.brdno !== board.brdno) });
+                }
+            });
+            if (newlist.length>0) {
+              _this.setState( {..._this.state, boards: newlist.concat(_this.state.boards) });
+              newlist = null;
+            }
     });
-  }
-
-  setModalVisible(visible) {
-    this.setState({modalVisible: visible});
-  }
-
-  handleLongPress (item) {
-    this.setState({modalVisible: true, selectedItem: item});
-  }
-
-  handleShowDetail () {
-    this.setModalVisible(false);
-    this.props.navigation.navigate('Details', {title: this.state.selectedItem.name})
-  }
-
-  handleDelete () {
-    const key = this.state.selectedItem.key;
-    this.setState({modalVisible: false, data: this.state.data.filter(row => row.key !== key)});
   }
 
   render() {
     return (
-      <View>
+      <View style={{flex:1, backgroundColor: '#f3f3f3'}}>
         <FlatList
-          data={this.state.data}
+          extraData={this.state.refreshing}
+          data={this.state.boards}
+          keyExtractor={(item) => item.brdno}
           renderItem={({ item }) => {
             return (
-              <ListItem title={item.name} avatar={{ source: { uri: item.avatar } }}
-                  leftAvatar={{ source: { uri: item.avatar } }}
-                  onPress={() => this.props.navigation.navigate('Details', {title: item.name})} 
-                  onLongPress={()=>this.handleLongPress(item)}/>
+              <ListItem title={item.brdtitle} subtitle={item.brdwriter} hideChevron={true} 
+                  badge={{ value: dateFormat(item.brddate, "yyyy-mm-dd"), textStyle: { color: 'gray' }, containerStyle: { backgroundColor: "white" } }}
+                  onPress={() => this.props.navigation.navigate('Details', {board: item})} />
             );
           }}
         />
         <TouchableOpacity style={styles.floatingButton}>
           <Icon name='plus' type='font-awesome' size={20} color="#01a699" onPress={() => this.props.navigation.navigate('NewScreen')} />
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={()=>this.setModalVisible(false)}>
-          <Modal animationType="slide" transparent={true} visible={this.state.modalVisible} onRequestClose={() => {}}>
-            <View style={styles.dialog}>
-              <View style={styles.dialogView}>
-                <Text style={styles.dialogTitle}>{this.state.selectedItem.name}</Text>
-                <TouchableOpacity onPress={() => this.handleShowDetail()}>
-                  <Text style={styles.dialogItem}>View Detail</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => this.handleDelete()}><Text style={styles.dialogItem}>Delete</Text></TouchableOpacity>
-              </View>
-            </View>
-        </Modal>          
-        </TouchableOpacity>
+        </TouchableOpacity>        
       </View>        
     );
   }
@@ -110,29 +80,5 @@ styles = StyleSheet.create({
     right: 10,
     backgroundColor:'#fff',
     borderRadius:100,
-  },
-  dialog: {
-    flex: 1, 
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  dialogView: {
-    padding: 10,
-  	borderWidth: 1,
-    borderColor: '#000',
-    borderRadius:10,
-	  backgroundColor: '#fff', 
-    width: 250,
-    height: 150
-  },
-  dialogTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-
-  },
-  dialogItem: {
-    fontSize: 16,
-    marginTop: 20
   },
 })
