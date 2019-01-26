@@ -54,7 +54,9 @@ export default class HomeTab extends Component {
           renderItem={({ item }) => {
             return (
               <ListItem title={item.brdtitle} subtitle={item.brdwriter} hideChevron={true} 
+                  leftIcon={{ name: 'user', type:'font-awesome' }}
                   badge={{ value: dateFormat(item.brddate, "yyyy-mm-dd"), textStyle: { color: 'gray' }, containerStyle: { backgroundColor: "white" } }}
+                  subtitleStyle={{ fontSize: 12 }}
                   onPress={() => this.props.navigation.navigate('Details', {board: item})} />
             );
           }}
